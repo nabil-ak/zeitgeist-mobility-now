@@ -1,4 +1,4 @@
-import React, { useReducer } from 'react';
+import React, { useReducer, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
@@ -23,6 +23,11 @@ const initialState = {
   subway: true,
 };
 
+function getInitialState() {
+  const saved = localStorage.getItem('preferences');
+  return saved ? JSON.parse(saved) : initialState;
+}
+
 function reducer(state, action) {
   switch (action.type) {
     case 'SET_PRIORITY':
@@ -43,7 +48,11 @@ function reducer(state, action) {
 }
 
 const PreferencesModal = ({ onClose, open }: PreferencesModalProps) => {
-  const [state, dispatch] = useReducer(reducer, initialState);
+  const [state, dispatch] = useReducer(reducer, initialState, getInitialState);
+
+  useEffect(() => {
+    localStorage.setItem('preferences', JSON.stringify(state));
+  }, [state]);
 
   const handleClose = () => {
     onClose();
