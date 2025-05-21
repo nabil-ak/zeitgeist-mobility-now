@@ -13,6 +13,8 @@ interface PreferencesModalProps {
 
 const PreferencesModal = ({ onClose }: PreferencesModalProps) => {
   const [open, setOpen] = useState(true);
+  const [selectedSwitches, setSelectedSwitches] = useState<number>(3);
+  const [selectedWalk, setSelectedWalk] = useState<number>(10);
   
   const handleClose = () => {
     setOpen(false);
@@ -29,11 +31,7 @@ const PreferencesModal = ({ onClose }: PreferencesModalProps) => {
         <div className="space-y-6 py-4">
           <div className="space-y-2">
             <h3 className="font-medium">Prioritäten</h3>
-            <RadioGroup defaultValue="realistic">
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="realistic" id="realistic" />
-                <Label htmlFor="realistic">Realistischste Ankunftszeit</Label>
-              </div>
+            <RadioGroup defaultValue="fast">
               <div className="flex items-center space-x-2">
                 <RadioGroupItem value="fast" id="fast" />
                 <Label htmlFor="fast">Schnellste Verbindung</Label>
@@ -51,28 +49,34 @@ const PreferencesModal = ({ onClose }: PreferencesModalProps) => {
             <div className="space-y-2">
               <div className="flex justify-between">
                 <Label htmlFor="max-transfers">Max. Umstiege</Label>
-                <span className="text-sm text-gray-500">3</span>
+                <span className="text-sm text-gray-500">{selectedSwitches}</span>
               </div>
               <Slider
                 id="max-transfers"
-                defaultValue={[3]}
+                defaultValue={[selectedSwitches]}
                 max={5}
                 step={1}
                 className="w-full"
+                onValueChange={(value) => {
+                  setSelectedSwitches(value[0]);
+                }}
               />
             </div>
             
             <div className="space-y-2">
               <div className="flex justify-between">
                 <Label htmlFor="max-walk">Max. Gehzeit pro Umstieg</Label>
-                <span className="text-sm text-gray-500">10 min</span>
+                <span className="text-sm text-gray-500">{selectedWalk} min</span>
               </div>
               <Slider
                 id="max-walk"
-                defaultValue={[10]}
+                defaultValue={[selectedWalk]}
                 max={20}
                 step={1}
                 className="w-full"
+                onValueChange={(value) => {
+                  setSelectedWalk(value[0]);
+                }}
               />
             </div>
             
