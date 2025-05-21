@@ -1,5 +1,4 @@
-
-import React, { useState } from 'react';
+import React, { useReducer } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
@@ -9,15 +8,44 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 
 interface PreferencesModalProps {
   onClose: () => void;
+  open: boolean;
 }
 
-const PreferencesModal = ({ onClose }: PreferencesModalProps) => {
-  const [open, setOpen] = useState(true);
-  const [selectedSwitches, setSelectedSwitches] = useState<number>(3);
-  const [selectedWalk, setSelectedWalk] = useState<number>(10);
-  
+const initialState = {
+  priority: 'fast',
+  selectedSwitches: 3,
+  selectedWalk: 10,
+  avoidCrowding: false,
+  safetyPrio: false,
+  train: true,
+  tram: true,
+  bus: true,
+  subway: true,
+};
+
+function reducer(state, action) {
+  switch (action.type) {
+    case 'SET_PRIORITY':
+      return { ...state, priority: action.value };
+    case 'SET_SWITCHES':
+      return { ...state, selectedSwitches: action.value };
+    case 'SET_WALK':
+      return { ...state, selectedWalk: action.value };
+    case 'SET_AVOID_CROWDING':
+      return { ...state, avoidCrowding: action.value };
+    case 'SET_SAFETY_PRIO':
+      return { ...state, safetyPrio: action.value };
+    case 'SET_TRANSPORT':
+      return { ...state, [action.transport]: action.value };
+    default:
+      return state;
+  }
+}
+
+const PreferencesModal = ({ onClose, open }: PreferencesModalProps) => {
+  const [state, dispatch] = useReducer(reducer, initialState);
+
   const handleClose = () => {
-    setOpen(false);
     onClose();
   };
   
@@ -31,7 +59,7 @@ const PreferencesModal = ({ onClose }: PreferencesModalProps) => {
         <div className="space-y-6 py-4">
           <div className="space-y-2">
             <h3 className="font-medium">Prioritäten</h3>
-            <RadioGroup defaultValue="fast">
+            <RadioGroup value={state.priority} onValueChange={value => dispatch({ type: 'SET_PRIORITY', value })}>
               <div className="flex items-center space-x-2">
                 <RadioGroupItem value="fast" id="fast" />
                 <Label htmlFor="fast">Schnellste Verbindung</Label>
@@ -48,34 +76,30 @@ const PreferencesModal = ({ onClose }: PreferencesModalProps) => {
             <div className="space-y-2">
               <div className="flex justify-between">
                 <Label htmlFor="max-transfers">Max. Umstiege</Label>
-                <span className="text-sm text-gray-500">{selectedSwitches}</span>
+                <span className="text-sm text-gray-500">{state.selectedSwitches}</span>
               </div>
               <Slider
                 id="max-transfers"
-                defaultValue={[selectedSwitches]}
+                value={[state.selectedSwitches]}
                 max={5}
                 step={1}
                 className="w-full"
-                onValueChange={(value) => {
-                  setSelectedSwitches(value[0]);
-                }}
+                onValueChange={value => dispatch({ type: 'SET_SWITCHES', value: value[0] })}
               />
             </div>
             
             <div className="space-y-2">
               <div className="flex justify-between">
                 <Label htmlFor="max-walk">Max. Gehzeit pro Umstieg</Label>
-                <span className="text-sm text-gray-500">{selectedWalk} min</span>
+                <span className="text-sm text-gray-500">{state.selectedWalk} min</span>
               </div>
               <Slider
                 id="max-walk"
-                defaultValue={[selectedWalk]}
+                value={[state.selectedWalk]}
                 max={20}
                 step={1}
                 className="w-full"
-                onValueChange={(value) => {
-                  setSelectedWalk(value[0]);
-                }}
+                onValueChange={value => dispatch({ type: 'SET_WALK', value: value[0] })}
               />
             </div>
             
@@ -84,7 +108,7 @@ const PreferencesModal = ({ onClose }: PreferencesModalProps) => {
                 <Label htmlFor="avoid-crowding">Überfüllte Verbindungen vermeiden</Label>
                 <p className="text-xs text-muted-foreground">Basierend auf historischen Daten</p>
               </div>
-              <Switch id="avoid-crowding" />
+              <Switch id="avoid-crowding" checked={state.avoidCrowding} onCheckedChange={value => dispatch({ type: 'SET_AVOID_CROWDING', value })} />
             </div>
             
             <div className="flex items-center justify-between">
@@ -92,7 +116,7 @@ const PreferencesModal = ({ onClose }: PreferencesModalProps) => {
                 <Label htmlFor="safety-prio">Sicherheit priorisieren</Label>
                 <p className="text-xs text-muted-foreground">Basierend auf Nutzerbewertungen</p>
               </div>
-              <Switch id="safety-prio" />
+              <Switch id="safety-prio" checked={state.safetyPrio} onCheckedChange={value => dispatch({ type: 'SET_SAFETY_PRIO', value })} />
             </div>
           </div>
           
@@ -100,19 +124,19 @@ const PreferencesModal = ({ onClose }: PreferencesModalProps) => {
             <h3 className="font-medium">Verkehrsmittelpräferenzen</h3>
             <div className="grid grid-cols-2 gap-3">
               <div className="flex items-center space-x-2">
-                <Switch id="train" defaultChecked />
+                <Switch id="train" checked={state.train} onCheckedChange={value => dispatch({ type: 'SET_TRANSPORT', transport: 'train', value })} />
                 <Label htmlFor="train">Zug</Label>
               </div>
               <div className="flex items-center space-x-2">
-                <Switch id="tram" defaultChecked />
+                <Switch id="tram" checked={state.tram} onCheckedChange={value => dispatch({ type: 'SET_TRANSPORT', transport: 'tram', value })} />
                 <Label htmlFor="tram">Straßenbahn</Label>
               </div>
               <div className="flex items-center space-x-2">
-                <Switch id="bus" defaultChecked />
+                <Switch id="bus" checked={state.bus} onCheckedChange={value => dispatch({ type: 'SET_TRANSPORT', transport: 'bus', value })} />
                 <Label htmlFor="bus">Bus</Label>
               </div>
               <div className="flex items-center space-x-2">
-                <Switch id="subway" defaultChecked />
+                <Switch id="subway" checked={state.subway} onCheckedChange={value => dispatch({ type: 'SET_TRANSPORT', transport: 'subway', value })} />
                 <Label htmlFor="subway">U-Bahn</Label>
               </div>
             </div>

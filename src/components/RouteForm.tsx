@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -82,9 +81,7 @@ const RouteForm = ({ onSearch }: { onSearch: () => void }) => {
         </Button>
       </div>
       
-      {showPreferences && (
-        <PreferencesModal onClose={() => setShowPreferences(false)} />
-      )}
+      <PreferencesModal open={showPreferences} onClose={() => setShowPreferences(false)} />
     </div>
   );
 };
