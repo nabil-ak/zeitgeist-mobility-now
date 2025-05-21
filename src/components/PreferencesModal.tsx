@@ -45,7 +45,6 @@ const PreferencesModal = ({ onClose }: PreferencesModalProps) => {
           
           <div className="space-y-4">
             <h3 className="font-medium">Komforteinstellungen</h3>
-            
             <div className="space-y-2">
               <div className="flex justify-between">
                 <Label htmlFor="max-transfers">Max. Umstiege</Label>
