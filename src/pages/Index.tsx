@@ -161,7 +161,7 @@ const Index = () => {
       
       <footer className="bg-gray-200 py-4">
         <div className="container mx-auto px-4 text-center text-sm text-gray-600">
-          <p>© 2025 Smart Transit App - KI-basierte Prognosen</p>
+          <p>© 2025 PendelAI - Jetzt weißt du, wann die Bahn wirklich kommt</p>
           <p className="text-xs mt-1">Die KI-Prognosen basieren auf historischen Daten und können von der tatsächlichen Reisezeit abweichen</p>
         </div>
       </footer>
