@@ -1,4 +1,3 @@
-
 import React from 'react';
 import RouteCard from './RouteCard';
 import { Button } from '@/components/ui/button';
@@ -26,9 +25,11 @@ interface Route {
 interface RoutesContainerProps {
   routes: Route[];
   isLoading: boolean;
+  onSaveRoute?: (route: Route) => void;
+  savedRouteIds?: number[];
 }
 
-const RoutesContainer = ({ routes, isLoading }: RoutesContainerProps) => {
+const RoutesContainer = ({ routes, isLoading, onSaveRoute, savedRouteIds = [] }: RoutesContainerProps) => {
   if (isLoading) {
     return (
       <div className="flex flex-col items-center justify-center py-8">
@@ -78,7 +79,12 @@ const RoutesContainer = ({ routes, isLoading }: RoutesContainerProps) => {
       
       <div>
         {routes.map((route) => (
-          <RouteCard key={route.id} {...route} />
+          <RouteCard 
+            key={route.id} 
+            {...route} 
+            isSaved={savedRouteIds.includes(route.id)}
+            onSave={() => onSaveRoute?.(route)}
+          />
         ))}
       </div>
     </div>

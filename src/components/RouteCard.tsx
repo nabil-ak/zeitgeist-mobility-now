@@ -1,15 +1,17 @@
-
 import React from 'react';
 import { 
   CalendarCheck, 
   Clock,
   ArrowRight,
-  MapPin
+  MapPin,
+  Heart
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { toast } from 'sonner';
 
 interface RouteProps {
+  id: number;
   departure: string;
   arrival: string;
   scheduledArrival: string;
@@ -26,9 +28,12 @@ interface RouteProps {
   delay: 'low' | 'medium' | 'high';
   safety: 'good' | 'medium' | 'bad';
   price: string;
+  isSaved?: boolean;
+  onSave?: () => void;
 }
 
 const RouteCard = ({
+  id,
   departure,
   arrival,
   scheduledArrival,
@@ -38,8 +43,13 @@ const RouteCard = ({
   crowd,
   delay,
   safety,
-  price
+  price,
+  isSaved = false,
+  onSave
 }: RouteProps) => {
+  const handleSaveRoute = () => {
+    onSave?.();
+  };
   
   const getDelayColor = (level: 'low' | 'medium' | 'high') => {
     switch(level) {
@@ -100,7 +110,7 @@ const RouteCard = ({
             </div>
             <div className="flex items-center text-xs text-gray-600 ml-2">
               <span className={`indicator ${getDelayColor(delay)}`}></span>
-              <span>KI-Prognose</span>
+              <span>Verspätung</span>
             </div>
           </div>
         </div>
@@ -150,9 +160,19 @@ const RouteCard = ({
           </Badge>
         </div>
         
-        <Button className="text-xs h-8 bg-db-blue hover:bg-blue-800">
-          Auswählen
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button 
+            variant="ghost" 
+            size="icon"
+            className={`hover:bg-red-50 ${isSaved ? 'text-red-500' : 'text-gray-400'}`}
+            onClick={handleSaveRoute}
+          >
+            <Heart className="h-5 w-5" fill={isSaved ? 'currentColor' : 'none'} />
+          </Button>
+          <Button className="text-xs h-8 bg-db-blue hover:bg-blue-800">
+            Auswählen
+          </Button>
+        </div>
       </div>
     </div>
   );

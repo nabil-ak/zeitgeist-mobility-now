@@ -1,12 +1,31 @@
-
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Header from '@/components/Header';
 import RouteForm from '@/components/RouteForm';
 import RoutesContainer from '@/components/RoutesContainer';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { toast } from 'sonner';
 
-const MOCK_ROUTES = [
+interface Route {
+  id: number;
+  departure: string;
+  arrival: string;
+  scheduledArrival: string;
+  duration: string;
+  transfers: number;
+  stations: {
+    name: string;
+    type: 'start' | 'transfer' | 'end';
+    time: string;
+    transit?: string;
+    platform?: string;
+  }[];
+  crowd: 'low' | 'medium' | 'high';
+  delay: 'low' | 'medium' | 'high';
+  safety: 'good' | 'medium' | 'bad';
+  price: string;
+}
+
+const MOCK_ROUTES: Route[] = [
   {
     id: 1,
     departure: '13:45',
@@ -42,7 +61,7 @@ const MOCK_ROUTES = [
   {
     id: 2,
     departure: '14:15',
-    arrival: '15:45',
+    arrival: '15:37',
     scheduledArrival: '15:35',
     duration: '1h 30min',
     transfers: 0,
@@ -67,7 +86,7 @@ const MOCK_ROUTES = [
   {
     id: 3,
     departure: '14:32',
-    arrival: '16:05',
+    arrival: '16:30',
     scheduledArrival: '15:55',
     duration: '1h 33min',
     transfers: 2,
@@ -105,9 +124,31 @@ const MOCK_ROUTES = [
   }
 ];
 
+const STORAGE_KEY = 'saved_routes';
+
 const Index = () => {
-  const [routes, setRoutes] = useState<typeof MOCK_ROUTES>([]);
+  const [routes, setRoutes] = useState<Route[]>([]);
+  const [savedRoutes, setSavedRoutes] = useState<Route[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  
+  // Load saved routes from localStorage on component mount
+  useEffect(() => {
+    const savedRoutesJson = localStorage.getItem(STORAGE_KEY);
+    if (savedRoutesJson) {
+      try {
+        const parsedRoutes = JSON.parse(savedRoutesJson);
+        setSavedRoutes(parsedRoutes);
+      } catch (error) {
+        console.error('Error loading saved routes:', error);
+        localStorage.removeItem(STORAGE_KEY);
+      }
+    }
+  }, []);
+  
+  // Save routes to localStorage whenever they change
+  useEffect(() => {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(savedRoutes));
+  }, [savedRoutes]);
   
   const handleSearch = () => {
     setIsLoading(true);
@@ -120,6 +161,22 @@ const Index = () => {
         description: "Die angezeigten Ankunftszeiten basieren auf historischen Verspätungsdaten",
       });
     }, 1500);
+  };
+
+  const handleSaveRoute = (route: Route) => {
+    const isAlreadySaved = savedRoutes.some(savedRoute => savedRoute.id === route.id);
+    
+    if (isAlreadySaved) {
+      setSavedRoutes(savedRoutes.filter(savedRoute => savedRoute.id !== route.id));
+      toast.info("Route entfernt", {
+        description: "Die Route wurde aus Ihren gespeicherten Reisen entfernt",
+      });
+    } else {
+      setSavedRoutes([...savedRoutes, route]);
+      toast.success("Route gespeichert", {
+        description: "Die Route wurde zu Ihren gespeicherten Reisen hinzugefügt",
+      });
+    }
   };
   
   return (
@@ -142,19 +199,32 @@ const Index = () => {
               <div className="mt-6">
                 <RoutesContainer 
                   routes={routes} 
-                  isLoading={isLoading} 
+                  isLoading={isLoading}
+                  onSaveRoute={handleSaveRoute}
+                  savedRouteIds={savedRoutes.map(route => route.id)}
                 />
               </div>
             )}
           </TabsContent>
           
           <TabsContent value="trips">
-            <div className="flex flex-col items-center justify-center bg-white rounded-lg shadow-md p-8 mt-4">
-              <h3 className="text-lg font-medium mb-2">Keine gespeicherten Reisen</h3>
-              <p className="text-sm text-gray-500">
-                Hier werden Ihre gespeicherten und geplanten Reisen angezeigt
-              </p>
-            </div>
+            {savedRoutes.length > 0 ? (
+              <div className="mt-4">
+                <RoutesContainer 
+                  routes={savedRoutes} 
+                  isLoading={false}
+                  onSaveRoute={handleSaveRoute}
+                  savedRouteIds={savedRoutes.map(route => route.id)}
+                />
+              </div>
+            ) : (
+              <div className="flex flex-col items-center justify-center bg-white rounded-lg shadow-md p-8 mt-4">
+                <h3 className="text-lg font-medium mb-2">Keine gespeicherten Reisen</h3>
+                <p className="text-sm text-gray-500">
+                  Hier werden Ihre gespeicherten und geplanten Reisen angezeigt
+                </p>
+              </div>
+            )}
           </TabsContent>
         </Tabs>
       </main>
