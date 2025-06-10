@@ -4,11 +4,18 @@ import {
   Clock,
   ArrowRight,
   MapPin,
-  Heart
+  Heart,
+  Info
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 interface RouteProps {
   id: number;
@@ -90,64 +97,78 @@ const RouteCard = ({
       case 'bad': return 'Gering';
     }
   };
+
+  const getDelayLabel = (level: 'low' | 'medium' | 'high') => {
+    switch(level) {
+      case 'low': return 'Gering';
+      case 'medium': return 'Mittel';
+      case 'high': return 'Hoch';
+    }
+  };
+
+  const getDelayIcon = (level: 'low' | 'medium' | 'high') => {
+    switch(level) {
+      case 'low': return '↓';
+      case 'medium': return '→';
+      case 'high': return '↑';
+    }
+  };
   
   return (
-    <div className="transit-card border-l-db-blue">
-      <div className="grid grid-cols-4 gap-2 mb-3">
-        <div className="col-span-3">
-          <div className="flex justify-between mb-1">
-            <div className="flex items-center">
-              <Clock className="w-4 h-4 mr-1 text-db-blue" />
-              <span className="text-sm font-medium">{departure} - {arrival}</span>
-            </div>
-            <span className="text-sm font-medium">{duration}</span>
+    <div className="bg-white rounded-lg shadow-md p-4 my-3 border-l-4 border-db-blue hover:shadow-lg transition-shadow">
+      <div className="flex justify-between items-start mb-4">
+        <div className="space-y-1">
+          <div className="flex items-center gap-2">
+            <span className="text-lg font-semibold text-db-blue">{departure}</span>
+            <ArrowRight className="h-4 w-4 text-gray-400" />
+            <span className="text-lg font-semibold">{arrival}</span>
           </div>
-          
-          <div className="flex flex-wrap gap-1 mt-1">
-            <div className="flex items-center text-xs text-gray-600">
-              <CalendarCheck className="w-3 h-3 mr-1" />
-              <span>Offiziell: {scheduledArrival}</span>
-            </div>
-            <div className="flex items-center text-xs text-gray-600 ml-2">
-              <span className={`indicator ${getDelayColor(delay)}`}></span>
-              <span>Verspätung</span>
-            </div>
+          <div className="flex items-center gap-2 text-sm text-gray-500">
+            <Clock className="h-4 w-4" />
+            <span>{duration}</span>
+            <span>•</span>
+            <span>{transfers} Umstiege</span>
           </div>
         </div>
         
-        <div className="flex flex-col items-end justify-between">
-          <span className="font-semibold text-db-blue">{price} €</span>
-          <span className="text-xs text-gray-500">{transfers} Umst.</span>
+        <div className="text-right">
+          <div className="text-lg font-semibold">{price}</div>
+          <div className="text-sm text-gray-500">2. Klasse</div>
         </div>
       </div>
       
-      <div className="mb-4">
+      <div className="space-y-3 mb-4">
         {stations.map((station, index) => (
-          <div key={index} className="flex items-center mb-2">
-            <div className="mr-2 w-5 flex justify-center">
-              <MapPin className="h-4 w-4 text-db-blue" />
-            </div>
-            <div className="flex-1">
-              <div className="flex items-center">
-                <span className="font-medium text-sm">{station.name}</span>
-                {station.platform && (
-                  <span className="ml-2 text-xs bg-gray-100 px-1 rounded">Gl. {station.platform}</span>
-                )}
-              </div>
-              {station.transit && (
-                <div className="flex items-center text-xs text-gray-600 mt-0.5">
-                  <span>{station.time}</span>
-                  <ArrowRight className="mx-1 h-3 w-3" />
-                  <span>{station.transit}</span>
-                </div>
+          <div key={index} className="flex items-start gap-3">
+            <div className="flex flex-col items-center">
+              <div className={`w-2 h-2 rounded-full ${
+                station.type === 'start' || station.type === 'end' ? 'bg-db-blue' : 'bg-gray-400'
+              }`} />
+              {index < stations.length - 1 && (
+                <div className="w-0.5 h-8 bg-gray-200" />
               )}
             </div>
-            <span className="text-sm font-medium">{station.time}</span>
+            <div className="flex-1">
+              <div className="flex justify-between items-start">
+                <div>
+                  <div className="font-medium">{station.name}</div>
+                  {station.platform && (
+                    <div className="text-sm text-gray-500">Gleis {station.platform}</div>
+                  )}
+                </div>
+                <div className="text-right">
+                  <div className="font-medium">{station.time}</div>
+                  {station.transit && (
+                    <div className="text-sm text-gray-500">{station.transit}</div>
+                  )}
+                </div>
+              </div>
+            </div>
           </div>
         ))}
       </div>
       
-      <div className="flex flex-wrap items-center justify-between">
+      <div className="flex flex-wrap items-center justify-between gap-2">
         <div className="flex items-center gap-2">
           <Badge variant="outline" className="flex items-center gap-1 border border-gray-300">
             <span className={`h-2 w-2 rounded-full ${getCrowdColor(crowd)}`}></span>
@@ -157,6 +178,21 @@ const RouteCard = ({
           <Badge variant="outline" className="flex items-center gap-1 border border-gray-300">
             <span className={`h-2 w-2 rounded-full ${getSafetyColor(safety)}`}></span>
             <span className="text-xs">Sicherheit: {getSafetyLabel(safety)}</span>
+          </Badge>
+
+          <Badge variant="outline" className="flex items-center gap-1 border border-gray-300">
+            <span className={`h-2 w-2 rounded-full ${getDelayColor(delay)}`}></span>
+            <span className="text-xs">Abweichung: {getDelayLabel(delay)}</span>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger>
+                  <Info className="h-3 w-3 text-gray-400" />
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Prognosesicherheit basierend auf historischen Daten</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           </Badge>
         </div>
         
@@ -173,6 +209,13 @@ const RouteCard = ({
             Auswählen
           </Button>
         </div>
+      </div>
+
+      <div className="mt-3 text-sm text-gray-500 flex items-center gap-2">
+        <span className="text-db-blue font-medium">KI-Prognose:</span>
+        <span>{arrival}</span>
+        <span className="text-gray-400">•</span>
+        <span>Offiziell: {scheduledArrival}</span>
       </div>
     </div>
   );

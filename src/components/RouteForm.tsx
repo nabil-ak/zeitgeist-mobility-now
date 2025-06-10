@@ -12,6 +12,12 @@ const RouteForm = ({ onSearch }: { onSearch: () => void }) => {
   const [date, setDate] = useState<Date | undefined>(new Date());
   const [time, setTime] = useState('12:00');
   const [showPreferences, setShowPreferences] = useState(false);
+
+  const handleNowClick = () => {
+    const now = new Date();
+    setDate(now);
+    setTime(format(now, 'HH:mm'));
+  };
   
   return (
     <div className="space-y-4 bg-white rounded-lg shadow-md p-4 animate-fade-in">
@@ -49,17 +55,27 @@ const RouteForm = ({ onSearch }: { onSearch: () => void }) => {
             </PopoverContent>
           </Popover>
         </div>
-        
+
         <div className="space-y-2">
           <label className="text-sm font-medium text-gray-500">Zeit</label>
-          <div className="flex items-center border rounded-md px-3 py-2 border-db-blue focus-within:ring-1 focus-within:ring-db-blue">
-            <Clock className="h-4 w-4 mr-2 text-gray-500" />
-            <input
-              type="time"
-              value={time}
-              onChange={(e) => setTime(e.target.value)}
-              className="outline-none flex-1"
-            />
+          <div className="flex items-center gap-2">
+            <div className="flex items-center border rounded-md px-3 py-2 border-db-blue focus-within:ring-1 focus-within:ring-db-blue flex-1">
+              <Clock className="h-4 w-4 mr-2 text-gray-500" />
+              <input
+                type="time"
+                value={time}
+                onChange={(e) => setTime(e.target.value)}
+                className="outline-none flex-1"
+              />
+            </div>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="text-xs bg-db-blue text-white hover:text-blue-800"
+              onClick={handleNowClick}
+            >
+              Jetzt
+            </Button>
           </div>
         </div>
       </div>

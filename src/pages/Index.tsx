@@ -75,7 +75,7 @@ const MOCK_ROUTES: Route[] = [
       {
         name: 'Dresden Hbf',
         type: 'end',
-        time: '15:45'
+        time: '15:37'
       }
     ],
     crowd: 'high',
@@ -114,7 +114,7 @@ const MOCK_ROUTES: Route[] = [
       {
         name: 'Dresden Hbf',
         type: 'end',
-        time: '16:05'
+        time: '16:30'
       }
     ],
     crowd: 'low',

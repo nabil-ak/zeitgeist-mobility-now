@@ -5,6 +5,12 @@ import { Slider } from '@/components/ui/slider';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Info } from 'lucide-react';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 interface PreferencesModalProps {
   onClose: () => void;
@@ -76,6 +82,14 @@ const PreferencesModal = ({ onClose, open }: PreferencesModalProps) => {
               <div className="flex items-center space-x-2">
                 <RadioGroupItem value="comfortable" id="comfortable" />
                 <Label htmlFor="comfortable">Komfortabelste Reise</Label>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Info className="h-4 w-4 text-gray-400" />
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Zeigt Verbindungen an, die bis zu 30 min länger sind, aber weniger Umstiege, geringere Auslastung und höhere Ausfallssicherheit bieten.</p>
+                  </TooltipContent>
+                </Tooltip>
               </div>
             </RadioGroup>
           </div>
@@ -83,7 +97,7 @@ const PreferencesModal = ({ onClose, open }: PreferencesModalProps) => {
           <div className="space-y-4">
             <h3 className="font-medium">Komforteinstellungen</h3>
             <div className="space-y-2">
-              <div className="flex justify-between">
+              <div className="flex justify-between items-center">
                 <Label htmlFor="max-transfers">Max. Umstiege</Label>
                 <span className="text-sm text-gray-500">{state.selectedSwitches}</span>
               </div>
@@ -98,7 +112,7 @@ const PreferencesModal = ({ onClose, open }: PreferencesModalProps) => {
             </div>
             
             <div className="space-y-2">
-              <div className="flex justify-between">
+              <div className="flex justify-between items-center">
                 <Label htmlFor="max-walk">Max. Gehzeit pro Umstieg</Label>
                 <span className="text-sm text-gray-500">{state.selectedWalk} min</span>
               </div>
@@ -110,6 +124,7 @@ const PreferencesModal = ({ onClose, open }: PreferencesModalProps) => {
                 className="w-full"
                 onValueChange={value => dispatch({ type: 'SET_WALK', value: value[0] })}
               />
+              <p className="text-xs text-gray-500">0 = Nur direkte Verbindungen ohne Fußweg</p>
             </div>
             
             <div className="flex items-center justify-between">
@@ -119,11 +134,23 @@ const PreferencesModal = ({ onClose, open }: PreferencesModalProps) => {
               </div>
               <Switch id="avoid-crowding" checked={state.avoidCrowding} onCheckedChange={value => dispatch({ type: 'SET_AVOID_CROWDING', value })} />
             </div>
-            
+          </div>
+          
+          <div className="space-y-4">
             <div className="flex items-center justify-between">
               <div className="space-y-0.5">
-                <Label htmlFor="safety-prio">Sicherheit priorisieren</Label>
-                <p className="text-xs text-muted-foreground">Basierend auf Nutzerbewertungen</p>
+                <div className="flex items-center gap-2">
+                  <Label htmlFor="safety-prio">Sicherheit priorisieren</Label>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Info className="h-4 w-4 text-gray-400" />
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Basierend auf Nutzerbewertungen zur Sicherheit an Bahnhöfen und auf Verbindungen. Verbindungen mit geringer Sicherheitsbewertung werden wenn möglich nicht angezeigt.</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </div>
+                <p className="text-xs text-muted-foreground">Basierend auf historischen Daten und Nutzerbewertungen</p>
               </div>
               <Switch id="safety-prio" checked={state.safetyPrio} onCheckedChange={value => dispatch({ type: 'SET_SAFETY_PRIO', value })} />
             </div>
