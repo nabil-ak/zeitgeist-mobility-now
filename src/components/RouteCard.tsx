@@ -5,7 +5,8 @@ import {
   ArrowRight,
   MapPin,
   Heart,
-  Info
+  Info,
+  ExternalLinkIcon
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -37,6 +38,7 @@ interface RouteProps {
   price: string;
   isSaved?: boolean;
   onSave?: () => void;
+  selectedDateTime: string;
 }
 
 const RouteCard = ({
@@ -52,7 +54,8 @@ const RouteCard = ({
   safety,
   price,
   isSaved = false,
-  onSave
+  onSave,
+  selectedDateTime
 }: RouteProps) => {
   const handleSaveRoute = () => {
     onSave?.();
@@ -205,8 +208,10 @@ const RouteCard = ({
           >
             <Heart className="h-5 w-5" fill={isSaved ? 'currentColor' : 'none'} />
           </Button>
-          <Button className="text-xs h-8 bg-db-blue hover:bg-blue-800">
-            Auswählen
+          <Button className="text-xs h-8 bg-db-blue hover:bg-blue-800" onClick={()=>{
+            window.open(`https://www.bahn.de/buchung/fahrplan/suche#sts=true&so=Berlin%20Hbf&zo=Dresden%20Hbf&kl=2&r=13:16:KLASSENLOS:1&soid=A=1@O=Berlin%20Hbf@X=13369549@Y=52525589@U=80@L=8011160@B=1@p=1749068087@i=U%C3%97008065969@&zoid=A=1@O=Dresden%20Hbf@X=13732039@Y=51040562@U=80@L=8010085@B=1@p=1747860008@i=U%C3%97008006050@&sot=ST&zot=ST&soei=8011160&zoei=8010085&hd=${selectedDateTime}&hza=D&hz=[]&ar=false&s=true&d=false&vm=00,01,02,03,04,05,06,07,08,09&fm=false&bp=false&dlt=false&dltv=false`, '_blank')
+          }}>
+            <ExternalLinkIcon className="h-4 w-4 text-white" />
           </Button>
         </div>
       </div>

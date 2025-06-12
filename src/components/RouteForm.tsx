@@ -8,7 +8,7 @@ import { CalendarIcon, Clock } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import PreferencesModal from './PreferencesModal';
 
-const RouteForm = ({ onSearch }: { onSearch: () => void }) => {
+const RouteForm = ({ onSearch }: { onSearch: (selectedDateTime: string) => void }) => {
   const [date, setDate] = useState<Date | undefined>(new Date());
   const [time, setTime] = useState('12:00');
   const [showPreferences, setShowPreferences] = useState(false);
@@ -17,6 +17,14 @@ const RouteForm = ({ onSearch }: { onSearch: () => void }) => {
     const now = new Date();
     setDate(now);
     setTime(format(now, 'HH:mm'));
+  };
+
+  const handleSearch = () => {
+    if (date) {
+      const formattedDate = format(date, 'yyyy-MM-dd');
+      const selectedDateTime = `${formattedDate}T${time}`;
+      onSearch(selectedDateTime);
+    }
   };
   
   return (
@@ -91,7 +99,7 @@ const RouteForm = ({ onSearch }: { onSearch: () => void }) => {
         
         <Button 
           className="bg-db-blue hover:bg-blue-800 text-white"
-          onClick={onSearch}
+          onClick={handleSearch}
         >
           Verbindungen suchen
         </Button>

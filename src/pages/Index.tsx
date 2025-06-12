@@ -130,6 +130,7 @@ const Index = () => {
   const [routes, setRoutes] = useState<Route[]>([]);
   const [savedRoutes, setSavedRoutes] = useState<Route[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [selectedDateTime, setSelectedDateTime] = useState<string>('');
   
   // Load saved routes from localStorage on component mount
   useEffect(() => {
@@ -150,12 +151,131 @@ const Index = () => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(savedRoutes));
   }, [savedRoutes]);
   
-  const handleSearch = () => {
+  const handleSearch = (dateTime: string) => {
     setIsLoading(true);
+    setSelectedDateTime(dateTime);
+    
+    // Parse the selected date and time
+    const [date, time] = dateTime.split('T');
+    const [hours, minutes] = time.split(':');
+    const baseTime = new Date(date);
+    baseTime.setHours(parseInt(hours), parseInt(minutes));
+
+    // Helper function to format time
+    const formatTime = (date: Date) => {
+      return `${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
+    };
+
+    // Helper function to add minutes to a date
+    const addMinutes = (date: Date, minutes: number) => {
+      const newDate = new Date(date);
+      newDate.setMinutes(date.getMinutes() + minutes);
+      return newDate;
+    };
+
+    // Generate mock routes with times based on the selected time
+    const mockRoutes: Route[] = [
+      {
+        id: 1,
+        departure: formatTime(baseTime),
+        arrival: formatTime(addMinutes(baseTime, 97)),
+        scheduledArrival: formatTime(addMinutes(baseTime, 85)),
+        duration: '1h 37min',
+        transfers: 1,
+        stations: [
+          {
+            name: 'Berlin Hbf',
+            type: 'start',
+            time: formatTime(baseTime),
+            platform: '7'
+          },
+          {
+            name: 'Leipzig Hbf',
+            type: 'transfer',
+            time: formatTime(addMinutes(baseTime, 67)),
+            transit: 'S-Bahn S1',
+            platform: '10'
+          },
+          {
+            name: 'Dresden Hbf',
+            type: 'end',
+            time: formatTime(addMinutes(baseTime, 97))
+          }
+        ],
+        crowd: 'medium',
+        delay: 'medium',
+        safety: 'good',
+        price: '29,90'
+      },
+      {
+        id: 2,
+        departure: formatTime(addMinutes(baseTime, 30)),
+        arrival: formatTime(addMinutes(baseTime, 112)),
+        scheduledArrival: formatTime(addMinutes(baseTime, 110)),
+        duration: '1h 30min',
+        transfers: 0,
+        stations: [
+          {
+            name: 'Berlin Hbf',
+            type: 'start',
+            time: formatTime(addMinutes(baseTime, 30)),
+            platform: '12'
+          },
+          {
+            name: 'Dresden Hbf',
+            type: 'end',
+            time: formatTime(addMinutes(baseTime, 112))
+          }
+        ],
+        crowd: 'high',
+        delay: 'low',
+        safety: 'medium',
+        price: '32,50'
+      },
+      {
+        id: 3,
+        departure: formatTime(addMinutes(baseTime, 47)),
+        arrival: formatTime(addMinutes(baseTime, 145)),
+        scheduledArrival: formatTime(addMinutes(baseTime, 118)),
+        duration: '1h 33min',
+        transfers: 2,
+        stations: [
+          {
+            name: 'Berlin Hbf',
+            type: 'start',
+            time: formatTime(addMinutes(baseTime, 47)),
+            platform: '5'
+          },
+          {
+            name: 'Königs Wusterhausen',
+            type: 'transfer',
+            time: formatTime(addMinutes(baseTime, 70)),
+            transit: 'RE3',
+            platform: '2'
+          },
+          {
+            name: 'Cottbus',
+            type: 'transfer',
+            time: formatTime(addMinutes(baseTime, 105)),
+            transit: 'RE8',
+            platform: '1'
+          },
+          {
+            name: 'Dresden Hbf',
+            type: 'end',
+            time: formatTime(addMinutes(baseTime, 145))
+          }
+        ],
+        crowd: 'low',
+        delay: 'high',
+        safety: 'good',
+        price: '27,90'
+      }
+    ];
     
     // Simulate API call with delay
     setTimeout(() => {
-      setRoutes(MOCK_ROUTES);
+      setRoutes(mockRoutes);
       setIsLoading(false);
       toast.success("Verbindungen wurden auf KI-Basis optimiert", {
         description: "Die angezeigten Ankunftszeiten basieren auf historischen Verspätungsdaten",
@@ -202,6 +322,7 @@ const Index = () => {
                   isLoading={isLoading}
                   onSaveRoute={handleSaveRoute}
                   savedRouteIds={savedRoutes.map(route => route.id)}
+                  selectedDateTime={selectedDateTime}
                 />
               </div>
             )}
@@ -215,6 +336,7 @@ const Index = () => {
                   isLoading={false}
                   onSaveRoute={handleSaveRoute}
                   savedRouteIds={savedRoutes.map(route => route.id)}
+                  selectedDateTime={selectedDateTime}
                 />
               </div>
             ) : (
