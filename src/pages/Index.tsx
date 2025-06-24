@@ -56,7 +56,7 @@ const MOCK_ROUTES: Route[] = [
     crowd: 'medium',
     delay: 'medium',
     safety: 'good',
-    price: '29,90'
+    price: '29,90€'
   },
   {
     id: 2,
@@ -81,7 +81,7 @@ const MOCK_ROUTES: Route[] = [
     crowd: 'high',
     delay: 'low',
     safety: 'medium',
-    price: '32,50'
+    price: '32,50€'
   },
   {
     id: 3,
@@ -120,7 +120,7 @@ const MOCK_ROUTES: Route[] = [
     crowd: 'low',
     delay: 'high',
     safety: 'good',
-    price: '27,90'
+    price: '27,90€'
   }
 ];
 
@@ -205,7 +205,7 @@ const Index = () => {
         crowd: 'medium',
         delay: 'medium',
         safety: 'good',
-        price: '29,90'
+        price: '29,90€'
       },
       {
         id: 2,
@@ -230,7 +230,7 @@ const Index = () => {
         crowd: 'high',
         delay: 'low',
         safety: 'medium',
-        price: '32,50'
+        price: '32,50€'
       },
       {
         id: 3,
@@ -269,7 +269,7 @@ const Index = () => {
         crowd: 'low',
         delay: 'high',
         safety: 'good',
-        price: '27,90'
+        price: '27,90€'
       }
     ];
     
